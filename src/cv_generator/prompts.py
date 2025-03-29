@@ -1,7 +1,7 @@
 """This module contains the prompts used for generating and formatting CVs.
 It includes prompts for formatting, summarizing, and adding sections to the CV.
 """
-# ruff ignore: F401, E501
+# --- CV Generation and Formatting Prompts ---
 
 # Initial formatting prompt
 FORMAT_MARKDOWN_PROMPT = """
@@ -15,7 +15,7 @@ Raw CV Text:
 ---
 
 Formatted Markdown CV:
-"""
+"""  # noqa: E501
 
 # Summarization prompt
 SUMMARIZE_HR_ROLES_PROMPT = """
@@ -31,7 +31,7 @@ Current Markdown CV:
 ---
 
 Updated Markdown CV with Summarized Section:
-"""
+"""  # noqa: E501
 
 # Certification addition prompt (Note - more robust templating might be needed)
 ADD_CERTIFICATIONS_PROMPT = """
@@ -50,7 +50,7 @@ Certifications to Add:
 ---
 
 Updated Markdown CV with New Certifications:
-"""
+"""  # noqa: E501
 
 # Badge section prompt (Example)
 ADD_BADGES_PROMPT = """
@@ -73,4 +73,4 @@ Current Markdown CV:
 ---
 
 Updated Markdown CV with Badge Section:
-"""
+"""  # noqa: E501

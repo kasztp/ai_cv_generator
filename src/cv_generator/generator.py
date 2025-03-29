@@ -1,17 +1,16 @@
 """Module for generating and refining CVs using the Gemini API."""
+
 import argparse
 import logging
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
 import google.generativeai as genai
+from dotenv import load_dotenv
 
 from . import prompts
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # --- Configuration ---
 load_dotenv()
@@ -70,7 +69,7 @@ def send_prompt_to_gemini(prompt: str) -> str | None:
     Returns:
     --------
         str | None: The generated text response from Gemini, or None if there was an error.
-    """
+    """  # noqa: E501
     try:
         logging.debug(f"Sending prompt (length {len(prompt)} chars) to Gemini...")
         response = model.generate_content(
@@ -81,10 +80,7 @@ def send_prompt_to_gemini(prompt: str) -> str | None:
 
         if response.parts:
             generated_text = response.text
-            logging.debug(
-                "Received response (length %s chars) from Gemini.",
-                len(generated_text)
-            )
+            logging.debug("Received response (length %s chars) from Gemini.", len(generated_text))
             return generated_text
 
         feedback = response.prompt_feedback
@@ -108,7 +104,7 @@ def process_cv(initial_cv_text: str, processing_steps: list[dict]) -> str | None
     Returns:
     --------
         str | None: The final processed CV text, or None if processing failed.
-    """
+    """  # noqa: E501
     current_cv_state = initial_cv_text
     logging.info(f"Starting CV processing with {len(processing_steps)} steps.")
 
@@ -136,9 +132,10 @@ def process_cv(initial_cv_text: str, processing_steps: list[dict]) -> str | None
 
         except KeyError as e:
             logging.error(
-                "Step %d failed: Missing key '%s' for prompt formatting. "
-                "Available keys: %s",
-                i, e, list(step_data.keys())
+                "Step %d failed: Missing key '%s' for prompt formatting. Available keys: %s",
+                i,
+                e,
+                list(step_data.keys()),
             )
             return None
 
@@ -155,9 +152,7 @@ def process_cv(initial_cv_text: str, processing_steps: list[dict]) -> str | None
 
 def parse_arguments():
     """Parses command-line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Generate and refine CVs using the Gemini API."
-    )
+    parser = argparse.ArgumentParser(description="Generate and refine CVs using the Gemini API.")
     parser.add_argument(
         "input_file",
         type=Path,
@@ -203,12 +198,12 @@ def main():
     - Gen AI & LLM on Databricks - Pre-sales (Databricks, Issued Oct 2024, Expires Oct 2026)
     # ... (rest of certifications) ...
     - Python 3 Tutorial Course (Sololearn, Issued Sep 2016)
-    """
+    """  # noqa: E501
     badge_info_text = """
     - SAP Interoperability: https://raw.githubusercontent.com/kasztp/cv-assets/main/badges/SAP_Interoperability_badge.png
     - Gen AI & LLM Pre-sales: https://raw.githubusercontent.com/kasztp/cv-assets/main/badges/Gen_AI_LLM_on_Databricks_badge.png
     # ... (rest of badge info) ...
-    """
+    """  # noqa: E501
 
     steps = [
         {
