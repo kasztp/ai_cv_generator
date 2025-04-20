@@ -170,7 +170,10 @@ def parse_arguments():
         "--mode",
         choices=["default", "concise", "full"],
         default="default",
-        help="Processing mode: default (format markdown), concise (concise markdown CV), or full (format + summarize + badges)."
+        help=(
+            "Processing mode: default (format markdown), concise (concise markdown CV), "
+            "or full (format + summarize + badges)."
+        )
     )
     return parser.parse_args()
 
