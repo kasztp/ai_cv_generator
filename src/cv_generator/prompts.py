@@ -74,3 +74,20 @@ Current Markdown CV:
 
 Updated Markdown CV with Badge Section:
 """  # noqa: E501
+
+# LinkedIn profile transformation prompt
+CONCISE_MARKDOWN_CV_PROMPT = """
+You are an expert CV editor. Given the raw extracted text from a LinkedIn profile PDF, reformat it into a concise, professional Markdown CV.
+- Use clear Markdown headings (e.g., # Name, ## Experience, ## Education, ## Skills).
+- Include all job experiences, listing each position and its details under the Experience section.
+- Remove redundancy, filler, and irrelevant content.
+- Include only the most relevant information for a technical job application.
+- Make the document well-structured and easy to read.
+
+Raw LinkedIn Profile Text:
+---
+{cv_text}
+---
+
+Concise Markdown CV:
+"""  # noqa: E501

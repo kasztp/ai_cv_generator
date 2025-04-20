@@ -7,6 +7,7 @@ from pathlib import Path
 
 import google.generativeai as genai
 from dotenv import load_dotenv
+from pypdf import PdfReader
 
 from . import prompts
 
@@ -156,7 +157,7 @@ def parse_arguments():
     parser.add_argument(
         "input_file",
         type=Path,
-        help="Path to the input CV text file.",
+        help="Path to the input CV file (text or PDF).",
     )
     parser.add_argument(
         "-o",
@@ -165,8 +166,35 @@ def parse_arguments():
         default=Path("output/generated_cv.md"),
         help="Path to save the generated Markdown CV file (default: output/generated_cv.md).",
     )
-
+    parser.add_argument(
+        "--mode",
+        choices=["default", "concise", "full"],
+        default="default",
+        help="Processing mode: default (format markdown), concise (concise markdown CV), or full (format + summarize + badges)."
+    )
     return parser.parse_args()
+
+
+def extract_text_from_pdf(pdf_path: Path) -> str:
+    """Extract text content from a PDF file.
+
+    Args:
+    -----
+        pdf_path (Path): Path to the PDF file.
+
+    Returns:
+    --------
+        str: Extracted text content from the PDF.
+    """
+    try:
+        reader = PdfReader(pdf_path)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+        return text
+    except Exception as e:
+        logging.error(f"Error extracting text from PDF {pdf_path}: {e}")
+        return ""
 
 
 def main():
@@ -183,8 +211,16 @@ def main():
         logging.error(f"Input CV path is not a file: {input_cv_path}")
         return
     try:
-        initial_text = input_cv_path.read_text(encoding="utf-8")
-        logging.info(f"Loaded initial CV text from {input_cv_path}")
+        # Detect file type automatically
+        if input_cv_path.suffix.lower() == ".pdf":
+            initial_text = extract_text_from_pdf(input_cv_path)
+            if not initial_text:
+                logging.error("Failed to extract text from PDF")
+                return
+            logging.info(f"Loaded initial CV PDF from {input_cv_path}")
+        else:
+            initial_text = input_cv_path.read_text(encoding="utf-8")
+            logging.info(f"Loaded initial CV text from {input_cv_path}")
     except FileNotFoundError:
         logging.error(f"Input CV file not found: {input_cv_path}")
         return
@@ -192,40 +228,42 @@ def main():
         logging.error(f"Error reading input CV file {input_cv_path}: {e}")
         return
 
-    # 2. Define Processing Steps
-    certifications_to_add = """
-    - Partner Training - Advantages of Data Intelligence & Interoperability with SAP (Databricks, Issued Feb 2025, Expires Feb 2027)
-    - Gen AI & LLM on Databricks - Pre-sales (Databricks, Issued Oct 2024, Expires Oct 2026)
-    # ... (rest of certifications) ...
-    - Python 3 Tutorial Course (Sololearn, Issued Sep 2016)
-    """  # noqa: E501
-    badge_info_text = """
-    - SAP Interoperability: https://raw.githubusercontent.com/kasztp/cv-assets/main/badges/SAP_Interoperability_badge.png
-    - Gen AI & LLM Pre-sales: https://raw.githubusercontent.com/kasztp/cv-assets/main/badges/Gen_AI_LLM_on_Databricks_badge.png
-    # ... (rest of badge info) ...
-    """  # noqa: E501
-
-    steps = [
-        {
-            "prompt_template": prompts.FORMAT_MARKDOWN_PROMPT,
-            "data": {},
-        },
-        {
-            "prompt_template": prompts.SUMMARIZE_HR_ROLES_PROMPT,
-            "data": {},
-        },
-        {
-            "prompt_template": prompts.ADD_CERTIFICATIONS_PROMPT,
-            "data": {"new_certifications_text": certifications_to_add},
-        },
-        {
-            "prompt_template": prompts.ADD_BADGES_PROMPT,
-            "data": {"badge_info_text": badge_info_text},
-        },
-    ]
+    # 2. Define Processing Steps based on mode
+    if args.mode == "default":
+        processing_steps = [
+            {
+                "prompt_template": prompts.FORMAT_MARKDOWN_PROMPT,
+                "description": "Format raw CV text into Markdown",
+            }
+        ]
+    elif args.mode == "concise":
+        processing_steps = [
+            {
+                "prompt_template": prompts.CONCISE_MARKDOWN_CV_PROMPT,
+                "description": "Transform into concise Markdown CV",
+            }
+        ]
+    elif args.mode == "full":
+        processing_steps = [
+            {
+                "prompt_template": prompts.FORMAT_MARKDOWN_PROMPT,
+                "description": "Format raw CV text into Markdown",
+            },
+            {
+                "prompt_template": prompts.SUMMARIZE_HR_ROLES_PROMPT,
+                "description": "Summarize HR/recruitment roles between IBM and Datapao",
+            },
+            {
+                "prompt_template": prompts.ADD_BADGES_PROMPT,
+                "description": "Add badge section with certifications",
+            }
+        ]
+    else:
+        logging.error(f"Unknown processing mode: {args.mode}")
+        return
 
     # 3. Process the CV
-    final_cv = process_cv(initial_text, steps)
+    final_cv = process_cv(initial_text, processing_steps)
 
     # 4. Save the Result
     if final_cv:
@@ -235,13 +273,10 @@ def main():
             output_cv_path.parent.mkdir(parents=True, exist_ok=True)
             output_cv_path.write_text(final_cv, encoding="utf-8")
             logging.info(f"Successfully generated and saved CV to {output_cv_path}")
-
         except Exception as e:
             logging.error(f"Error saving generated CV to {output_cv_path}: {e}")
-
     else:
         logging.error("CV generation failed. No output file created.")
-
     logging.info("--- Gemini CV Processor Finished ---")
 
 
