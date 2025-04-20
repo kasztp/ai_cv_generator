@@ -32,9 +32,7 @@ def mock_gemini_model(mocker):
     mock_model.generate_content.return_value = mock_response
 
     # Patch where 'GenerativeModel' is looked up *within the generator module*
-    mocker.patch(
-        "cv_generator.generator.genai.GenerativeModel", return_value=mock_model
-    )
+    mocker.patch("cv_generator.generator.genai.GenerativeModel", return_value=mock_model)
     mocker.patch("cv_generator.generator.model", new=mock_model)
 
     return mock_model
@@ -60,9 +58,7 @@ def test_send_prompt_to_gemini_error(monkeypatch):
 
 def test_process_cv_success(mock_gemini_model, mocker):
     """Test process_cv runs all steps and returns final text."""
-    mocker.patch(
-        "cv_generator.generator.send_prompt_to_gemini", return_value="Step1 Output"
-    )
+    mocker.patch("cv_generator.generator.send_prompt_to_gemini", return_value="Step1 Output")
     steps = [
         {"prompt_template": "Prompt {cv_text}", "data": {}},
         {"prompt_template": "Prompt {cv_text}", "data": {}},
