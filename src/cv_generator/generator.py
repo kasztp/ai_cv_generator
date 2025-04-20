@@ -11,7 +11,9 @@ from pypdf import PdfReader
 
 from . import prompts
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # --- Configuration ---
 load_dotenv()
@@ -81,7 +83,9 @@ def send_prompt_to_gemini(prompt: str) -> str | None:
 
         if response.parts:
             generated_text = response.text
-            logging.debug("Received response (length %s chars) from Gemini.", len(generated_text))
+            logging.debug(
+                "Received response (length %s chars) from Gemini.", len(generated_text)
+            )
             return generated_text
 
         feedback = response.prompt_feedback
@@ -153,7 +157,9 @@ def process_cv(initial_cv_text: str, processing_steps: list[dict]) -> str | None
 
 def parse_arguments():
     """Parses command-line arguments."""
-    parser = argparse.ArgumentParser(description="Generate and refine CVs using the Gemini API.")
+    parser = argparse.ArgumentParser(
+        description="Generate and refine CVs using the Gemini API."
+    )
     parser.add_argument(
         "input_file",
         type=Path,
@@ -173,7 +179,7 @@ def parse_arguments():
         help=(
             "Processing mode: default (format markdown), concise (concise markdown CV), "
             "or full (format + summarize + badges)."
-        )
+        ),
     )
     return parser.parse_args()
 
@@ -259,7 +265,7 @@ def main():
             {
                 "prompt_template": prompts.ADD_BADGES_PROMPT,
                 "description": "Add badge section with certifications",
-            }
+            },
         ]
     else:
         logging.error(f"Unknown processing mode: {args.mode}")
