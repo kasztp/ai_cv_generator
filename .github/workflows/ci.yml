@@ -41,4 +41,9 @@ jobs:
       env:
          # Set dummy key for tests if needed, though mocks should avoid needing it
          GEMINI_API_KEY: "DUMMY_KEY_FOR_CI"
-      run: uv run pytest
+      run: uv run pytest --cov=src --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

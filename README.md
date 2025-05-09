@@ -1,4 +1,8 @@
 # AI CV Generator
+[![CI Tests](https://github.com/kasztp/ai_cv_generator/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/kasztp/ai_cv_generator/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/kasztp/ai_cv_generator/graph/badge.svg)](https://codecov.io/gh/kasztp/ai_cv_generator)
+[![Ruff](https://img.shields.io/badge/Ruff-lint%20%26%20format-success)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/badge/uv-lightning_fast_build_tool-blue)](https://github.com/astral-sh/uv)
 
 The AI CV Generator is a Python tool designed to process and refine resumes using Google's Gemini Large Language Model. It takes raw CV text or pdf resume as input and applies a user-defined sequence of AI-powered transformations to produce a polished editable Markdown document.
 
